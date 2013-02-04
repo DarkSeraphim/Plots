@@ -1,0 +1,14 @@
+# Time is in seconds
+world: world
+chunk-cost: 0
+chunk-unselect-time: 15
+save-interval: 300
+
+tool:
+  id: 280
+  name: 'Chunk selector'
+  lore:
+    - 'This is the Chunk Selector'
+    - 'First click selects the chunk'
+    - 'Second click buys it, if your balance allows it'
+    - 'Chunks are automagically un-selected after 15 seconds'

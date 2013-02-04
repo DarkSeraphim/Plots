@@ -1,0 +1,10 @@
+name: Plots
+version: 0.1
+main: com.github.DarkSeraphim.Plots.Plots
+author: Fireblast709
+depend: [Essentials]
+
+commands:
+  plots:
+    description: plots command
+    default: true
