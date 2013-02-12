@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  *
@@ -29,13 +30,23 @@ public class InventoryListener implements Listener
         if(event.getWhoClicked() instanceof Player == false) return;
         if(p.getTool().isSimilar((event.getCurrentItem())))
         {
-            event.setCancelled(true);
+            //event.setCancelled(true);
             event.setResult(Event.Result.DENY);
-            Player clicker = (Player) event.getWhoClicked();
-            ItemStack cursor = event.getCursor();
+            final Player clicker = (Player) event.getWhoClicked();
+            final ItemStack cursor = event.getCursor();
+            ItemStack current = event.getCurrentItem();
             //clicker.getOpenInventory().setCursor(cursor);
-            //clicker.sendMessage("Cursor: "+(cursor != null ? cursor.getType().name().toLowerCase().replace('_', ' ') : "null"));
-            clicker.updateInventory();
+            clicker.sendMessage("Cursor: "+(cursor != null ? cursor.getType().name().toLowerCase().replace('_', ' ') : "null"));
+            clicker.sendMessage("Current: "+(current != null ? current.getType().name().toLowerCase().replace('_', ' ') : "null"));
+            new BukkitRunnable()
+            {
+                @Override
+                public void run()
+                {
+                    clicker.getOpenInventory().setCursor(cursor);
+                    clicker.updateInventory();
+                }
+            }.runTaskLater(p, 1L);
             clicker.sendMessage(ChatColor.RED+"You cannot remove your tool. Use /plots tool to remove");
         }
     }
