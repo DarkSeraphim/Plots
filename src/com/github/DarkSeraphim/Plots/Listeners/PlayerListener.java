@@ -17,7 +17,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
@@ -32,24 +34,32 @@ public class PlayerListener implements Listener
     
     private Map<String, Vector[]> locCache = new WeakHashMap<String, Vector[]>();
     
+    private ItemStack zeroTool;
+    
     public PlayerListener(Plots p)
     {
         this.p = p;
+        this.zeroTool = p.getTool().clone();
+        this.zeroTool.setAmount(0);
     }
     
     @EventHandler(priority=EventPriority.HIGH, ignoreCancelled=true)
     public void onInteract(PlayerInteractEvent event)
     {
         if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if(!event.getItem().isSimilar(this.p.getTool())) return;
+        if(!this.p.getTool().isSimilar(event.getItem())) return;
         final Player player = event.getPlayer();
         if(!player.getWorld().getName().equals(p.getWorld())) return;
         Chunk c = player.getLocation().getChunk();
         String chunk = c.getX()+","+c.getZ();
         if(p.getChunkManager().chunkIsOwned(chunk))
         {
-            player.sendMessage(GOLD+"Someone else has bought that chunk");
+            player.sendMessage((player.getName().equals(p.getChunkManager().getChunkOwner(chunk)) ? GREEN+"You have" : GOLD+"Someone else has")+" bought that chunk");
             return;
+        }
+        if(!p.getChunkManager().canClaim(chunk))
+        {
+            player.sendMessage(RED+"You cannot claim this chunk");
         }
         String oldchunk = p.getPlayerSelections().get(player.getName());
         if(chunk.equals(oldchunk))
@@ -136,6 +146,17 @@ public class PlayerListener implements Listener
                 Location l = v.toLocation(w);
                 player.sendBlockChange(l, l.getBlock().getType(), l.getBlock().getData());
             }
+        }
+    }
+    
+    @EventHandler
+    public void onDrop(final PlayerDropItemEvent event)
+    {
+        if(p.getTool().isSimilar(event.getItemDrop().getItemStack()))
+        {
+            event.setCancelled(true);
+            event.getItemDrop().setItemStack(this.zeroTool);
+            event.getPlayer().getInventory().setItem(8, p.getTool());
         }
     }
     

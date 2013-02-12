@@ -12,3 +12,6 @@ tool:
     - 'First click selects the chunk'
     - 'Second click buys it, if your balance allows it'
     - 'Chunks are automagically un-selected after 15 seconds'
+    
+noclaim-chunks:
+  - 0,0

@@ -1,16 +1,16 @@
 package com.github.DarkSeraphim.Plots;
 
-import com.github.DarkSeraphim.Plots.Listeners.PlayerListener;
+import com.github.DarkSeraphim.Plots.Listeners.*;
+import com.github.DarkSeraphim.Plots.commands.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
-import static org.bukkit.ChatColor.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
@@ -36,6 +36,19 @@ public class Plots extends JavaPlugin
     private ItemStack tool;
     
     private ChunkManager cmanager;
+    
+    /*********************************************\
+     *                 Commands                  * 
+    \*********************************************/
+    private CommandAddMember cmdAddMember;
+    private CommandTool cmdTool;
+    private CommandList cmdList;
+    private CommandRemove cmdRemove;
+    private CommandRemoveMember cmdRemoveMember;
+    private CommandNoClaim cmdNoClaim;
+    
+    private final List<String> ADDMEMBER_ALIAS = Arrays.asList("addmember", "addm", "am", "addmem");
+    private final List<String> REMMEMBER_ALIAS = Arrays.asList("removemember", "remm", "rm", "remmem", "kick", "kickmember");
     
     @Override
     public void onEnable()
@@ -79,6 +92,16 @@ public class Plots extends JavaPlugin
         
         // Register
         pm.registerEvents(new PlayerListener(this), this);
+        pm.registerEvents(new BlockListener(this), this);
+        pm.registerEvents(new InventoryListener(this), this);
+        
+        // Initializing commands
+        this.cmdTool = new CommandTool(this);
+        this.cmdList = new CommandList(this);
+        this.cmdRemove = new CommandRemove(this);
+        this.cmdNoClaim = new CommandNoClaim(this);
+        this.cmdAddMember = new CommandAddMember(this);
+        this.cmdRemoveMember = new CommandRemoveMember(this);
         
         new BukkitRunnable()
         {
@@ -128,53 +151,39 @@ public class Plots extends JavaPlugin
         {
             if(args.length > 0)
             {
-                if(args[0].equals("tool"))
+                if(ADDMEMBER_ALIAS.contains(args[0].toLowerCase()))
                 {
-                    if(sender instanceof Player == false)
-                    {
-                        sender.sendMessage("Tools have no effect for consoles :P");
-                    }
-                    else
-                    {
-                        ((Player)sender).getInventory().addItem(this.tool);
-                    }
+                    this.cmdAddMember.execute(sender, args);
                 }
-                else if(args[0].equals("list"))
+                if(REMMEMBER_ALIAS.contains(args[0].toLowerCase()))
                 {
-                    if(args.length > 1)
-                    {
-                        sender.sendMessage(GREEN+args[1]+" owns the following chunks:");
-                        for(String chunk: this.getChunkManager().getOwnedChunks(args[1]))
-                        {
-                            sender.sendMessage(GREEN+" * "+chunk);
-                        }
-                        if(this.getChunkManager().getOwnedChunks(args[1]).size() < 1)
-                        {
-                            sender.sendMessage(GOLD+" - No chunks found - ");
-                        }
-                    }
-                    else
-                    {
-                        if(sender instanceof Player == false)
-                        {
-                            sender.sendMessage("The console cannot own chunks ;D");
-                            return true;
-                        }
-                        sender.sendMessage(GREEN+"You own the following chunks:");
-                        for(String chunk: this.getChunkManager().getOwnedChunks(sender.getName()))
-                        {
-                            sender.sendMessage(GREEN+" * "+chunk);
-                        }
-                        if(this.getChunkManager().getOwnedChunks(sender.getName()).size() < 1)
-                        {
-                            sender.sendMessage(GOLD+" - No chunks found - ");
-                        }
-                    }
+                    this.cmdRemoveMember.execute(sender, args);
+                }
+                else if(args[0].equalsIgnoreCase("tool") || args[0].equalsIgnoreCase("t"))
+                {
+                    this.cmdTool.execute(sender, args);
+                }
+                else if(args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l"))
+                {
+                    this.cmdList.execute(sender, args);
+                }
+                else if(args[0].equalsIgnoreCase("remove"))
+                {
+                    this.cmdRemove.execute(sender, args);
+                }
+                else if(args[0].equals("noclaim"))
+                {
+                    this.cmdNoClaim.execute(sender, args);
                 }
             }
             else
             {
                 sender.sendMessage("Plots v"+this.getDescription().getVersion()+" by Fireblast709");
+                if(sender.hasPermission("plots.noclaim"))
+                {
+                    sender.sendMessage("/plots noclaim add|remove - add or remove noclaim chunks");
+                }
+                sender.sendMessage("/plots list "+(sender.hasPermission("plots.list.others") ? "[player] " : "")+"- show your "+(sender.hasPermission("plots.list.others") ? "or another player's " : "" )+"chunk list");
             }
         }
         return true;
