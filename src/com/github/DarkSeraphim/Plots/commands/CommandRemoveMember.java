@@ -1,7 +1,7 @@
 package com.github.DarkSeraphim.Plots.commands;
 
 import com.github.DarkSeraphim.Plots.Plots;
-import org.bukkit.ChatColor;
+import static org.bukkit.ChatColor.*;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,7 +27,7 @@ public class CommandRemoveMember extends CommandBase
         {
             if(args.length != 2)
             {
-                sender.sendMessage("Invalid arguments: /plots removemember <player>");
+                sender.sendMessage(RED+"Invalid arguments: /plots removemember <player>");
                 return true;
             }
             Player player = (Player)sender;
@@ -47,11 +47,11 @@ public class CommandRemoveMember extends CommandBase
         
         if(p.getChunkManager().removeMember(chunk, member))
         {
-            sender.sendMessage(ChatColor.GREEN+"Member "+member+" removed from "+chunk);
+            sender.sendMessage(GREEN+"Member "+member+" removed from "+chunk);
         }
         else
         {
-            sender.sendMessage(ChatColor.RED+"Failed to remove member "+member+" from "+chunk+". Was he a member?");
+            sender.sendMessage(RED+"Failed to remove member "+member+" from "+chunk+". Was he a member?");
         }
         return true;
     }

@@ -26,6 +26,7 @@ public class CommandNoClaim extends CommandBase
             sender.sendMessage("You would have to be an online player");
             return true;
         }
+        if(!((Player)sender).getWorld().getName().equals(p.getWorld())) return true;
         if(args.length > 1)
         {
             if(!sender.hasPermission("plots.noclaim"))
@@ -39,32 +40,32 @@ public class CommandNoClaim extends CommandBase
             {
                 if(this.p.getChunkManager().addNoClaimChunk(chunk))
                 {
-                    sender.sendMessage("Noclaim chunk added");
+                    sender.sendMessage(GREEN+"Noclaim chunk added");
                 }
                 else
                 {
-                    sender.sendMessage("Failed to add noclaim chunk (was it added already?)");
+                    sender.sendMessage(RED+"Failed to add noclaim chunk (was it added already?)");
                 }
             }
             else if(args[1].equals("remove"))
             {
                 if(this.p.getChunkManager().removeNoClaimChunk(chunk))
                 {
-                    sender.sendMessage("Noclaim chunk removed");
+                    sender.sendMessage(GREEN+"Noclaim chunk removed");
                 }
                 else
                 {
-                    sender.sendMessage("Failed to remove noclaim chunk (was it even added?)");
+                    sender.sendMessage(RED+"Failed to remove noclaim chunk (was it even added?)");
                 }
             }
             else
             {
-                sender.sendMessage("Please specify if you want to add or remove noclaim chunks");
+                sender.sendMessage(RED+"Please specify if you want to add or remove noclaim chunks");
             }
         }
         else
         {
-            sender.sendMessage("Please specify if you want to add or remove noclaim chunks");
+            sender.sendMessage(RED+"Please specify if you want to add or remove noclaim chunks");
         }
         return true;
     }

@@ -23,14 +23,14 @@ import org.bukkit.entity.Player;
  *
  * @author DarkSeraphim
  */
-public class CommandRemove extends CommandBase
+public class CommandSell extends CommandBase
 {
         
     private DeletePrompt deletePrompt;
     
     private ConversationFactory cf;
     
-    public CommandRemove(Plots p)
+    public CommandSell(Plots p)
     {
         super(p);
         this.cf = new ConversationFactory(this.p);
@@ -45,6 +45,7 @@ public class CommandRemove extends CommandBase
             sender.sendMessage("Only players can own chunks ;D");
             return true;
         }
+        if(!((Player)sender).getWorld().getName().equals(p.getWorld())) return true;
         Chunk c = ((Player)sender).getLocation().getChunk();
         String chunk = c.getX()+","+c.getZ();
         if(!(this.p.getChunkManager().getOwnedChunks(sender.getName()).contains(chunk) || sender.hasPermission("plots.remove.other")))
@@ -59,15 +60,7 @@ public class CommandRemove extends CommandBase
         }
         Player player = (Player)sender;
         cf.thatExcludesNonPlayersWithMessage("Sorry, this is a player-only conversation");
-        cf.withPrefix(new org.bukkit.conversations.ConversationPrefix() 
-            {
-
-                @Override
-                public String getPrefix(ConversationContext cc)
-                {
-                    return ChatColor.GREEN+"[Plots]: "+ChatColor.WHITE;
-                }
-            });
+        cf.withPrefix(new org.bukkit.conversations.NullConversationPrefix());
         cf.withFirstPrompt(this.deletePrompt);
         cf.withLocalEcho(false);
         Map<Object, Object> session = new HashMap<Object, Object>();
@@ -107,20 +100,20 @@ public class CommandRemove extends CommandBase
             if(val == null) return Prompt.END_OF_CONVERSATION;
             String chunk = val.toString();
             Player player = (Player)cc.getForWhom();
-            if(CommandRemove.this.p.getChunkManager().removeChunk(player.getName(), chunk, player.hasPermission("plots.remove.others")))
+            if(CommandSell.this.p.getChunkManager().removeChunk(player.getName(), chunk, player.hasPermission("plots.remove.others")))
             {
                 try
                 {
-                    Economy.add(player.getName(), CommandRemove.this.p.getCost());
+                    Economy.add(player.getName(), CommandSell.this.p.getCost()*0.75D);
                     player.sendRawMessage(ChatColor.GREEN+"Successfully sold chunk");
                 }
                 catch (UserDoesNotExistException ex)
                 {
-                    CommandRemove.this.p.getLogger().log(Level.WARNING, "Player {0} not found in Essentials. Is it running properly?", player.getName());
+                    CommandSell.this.p.getLogger().log(Level.WARNING, "Player {0} not found in Essentials. Is it running properly?", player.getName());
                 }
                 catch (NoLoanPermittedException ex)
                 {
-                    CommandRemove.this.p.getLogger().log(Level.WARNING, "Player {0} tried to loan, but that was not allowed", player.getName());
+                    CommandSell.this.p.getLogger().log(Level.WARNING, "Player {0} tried to loan, but that was not allowed", player.getName());
                 }
             }
             else
@@ -134,7 +127,7 @@ public class CommandRemove extends CommandBase
         @Override
         public String getPromptText(ConversationContext cc)
         {
-            return "Are you sure you want to sell this chunk? (yes/no)";
+            return ChatColor.GREEN+"Are you sure you want to sell this chunk? (yes/no)";
         }
         
     }

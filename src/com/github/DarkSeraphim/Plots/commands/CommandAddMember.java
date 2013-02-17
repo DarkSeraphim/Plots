@@ -2,9 +2,10 @@ package com.github.DarkSeraphim.Plots.commands;
 
 import com.github.DarkSeraphim.Plots.Plots;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import static org.bukkit.ChatColor.*;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 /**
@@ -22,32 +23,37 @@ public class CommandAddMember extends CommandBase
     @Override
     public boolean execute(CommandSender sender, String[] args)
     {
-        if(sender instanceof Player == false)
+        if(sender instanceof ConsoleCommandSender == false)
         {
-            sender.sendMessage("You must be able to own chunks, to add players");
             return true;
         }
-        if(args.length != 2)
+        if(args.length != 4)
         {
-            sender.sendMessage(ChatColor.RED+"Incorrect syntax: /plots addmember <player>");
+            sender.sendMessage(RED+"Incorrect syntax: /plot addmember <x,z coord> <owner> <member>");
             return true;
         }
-        if(Bukkit.getPlayer(args[1]) == null)
+        String chunk = args[1];
+        
+        Player player = Bukkit.getPlayer(args[2]);
+        if(player == null)
         {
-            sender.sendMessage(ChatColor.RED+"That player is not online");
+            sender.sendMessage(RED+"That player is not online");
             return true;
         }
-        Player player = (Player) sender;
-        Chunk c = player.getLocation().getChunk();
-        String chunk = c.getX()+","+c.getZ();
+        Player target = Bukkit.getPlayer(args[3]);
+        if(target == null)
+        {
+            player.sendMessage(RED+"That player is not online");
+            return true;
+        }
         if(p.getChunkManager().getOwnedChunks(player.getName()).contains(chunk))
         {
             p.getChunkManager().addMember(chunk, args[1]);
-            sender.sendMessage(ChatColor.GREEN+"Member "+args[1]+" added to chunk "+chunk);
+            player.sendMessage(GREEN+"Member "+args[1]+" added to chunk "+chunk);
         }
         else
         {
-            sender.sendMessage(ChatColor.RED+"You do not own that chunk");
+            sender.sendMessage(GREEN+"You do not own that chunk");
         }
         return true;
     }

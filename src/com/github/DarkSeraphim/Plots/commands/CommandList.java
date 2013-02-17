@@ -22,14 +22,14 @@ public class CommandList extends CommandBase
     {
         if(args.length > 1 && sender.hasPermission("plots.list.other"))
         {
-            sender.sendMessage(GREEN+args[1]+" owns the following chunks:");
+            sender.sendMessage(GREEN+""+args[1]+" owns the following chunks:");
             for(String chunk: this.p.getChunkManager().getOwnedChunks(args[1]))
             {
-                sender.sendMessage(GREEN+" * "+chunk);
+                sender.sendMessage(" * "+chunk);
             }
             if(this.p.getChunkManager().getOwnedChunks(args[1]).size() < 1)
             {
-                sender.sendMessage(GOLD+" - No chunks found - ");
+                sender.sendMessage(" - No chunks found - ");
             }
         }
         else
@@ -42,11 +42,11 @@ public class CommandList extends CommandBase
             sender.sendMessage(GREEN+"You own the following chunks:");
             for(String chunk: this.p.getChunkManager().getOwnedChunks(sender.getName()))
             {
-                sender.sendMessage(GREEN+" * "+chunk);
+                sender.sendMessage(" * "+chunk);
             }
             if(this.p.getChunkManager().getOwnedChunks(sender.getName()).size() < 1)
             {
-                sender.sendMessage(GOLD+" - No chunks found - ");
+                sender.sendMessage(" - No chunks found - ");
             }
         }
         return true;

@@ -5,16 +5,20 @@ author: Fireblast709
 depend: [Essentials]
 
 commands:
-  plots:
+  plot:
     description: main Plots command
-    default: true
+    aliases: p
     
 permissions:
   plots.*:
     children:
+      plots.unclaim: true
+      plots.unclaim.other: true
       plots.claim: true
       plots.noclaim: true
       plots.list.other: true
+      plots.override: true
+  
   plots.claim:
     description: Permission for claiming chunks
     default: true
@@ -23,5 +27,10 @@ permissions:
     default: op
   plots.list.other:
     description: Permission to list other people's claimed chunks
+    default: op
   plots.unclaim.other:
     description: Unclaim other plots
+    default: op
+  plots.override:
+    description: Permission to override normal rules (admins)
+    default: op
