@@ -187,9 +187,9 @@ public class ChunkManager
         return !this.noclaim.contains(chunk);
     }
     
-    public boolean canBuild(String player, String chunk)
+    public boolean canBuild(Player player, String chunk)
     {
-        return getOwnedChunks(player).contains(chunk) || getMemberChunks(player).contains(chunk);
+        return getOwnedChunks(player.getName()).contains(chunk) || getMemberChunks(player.getName()).contains(chunk) || player.hasPermission("plots.override");
     }
 
     public void save()

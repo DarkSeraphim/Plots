@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
@@ -37,13 +38,15 @@ public class Plots extends JavaPlugin
     
     private ChunkManager cmanager;
     
+    private final int offset = 3;
+    
     /*********************************************\
      *                 Commands                  * 
     \*********************************************/
     private CommandAddMember cmdAddMember;
     private CommandTool cmdTool;
     private CommandList cmdList;
-    private CommandRemove cmdRemove;
+    private CommandSell cmdSell;
     private CommandRemoveMember cmdRemoveMember;
     private CommandNoClaim cmdNoClaim;
     
@@ -90,18 +93,18 @@ public class Plots extends JavaPlugin
             return;
         }
         
-        // Register
-        pm.registerEvents(new PlayerListener(this), this);
-        pm.registerEvents(new BlockListener(this), this);
-        pm.registerEvents(new InventoryListener(this), this);
-        
         // Initializing commands
         this.cmdTool = new CommandTool(this);
         this.cmdList = new CommandList(this);
-        this.cmdRemove = new CommandRemove(this);
+        this.cmdSell = new CommandSell(this);
         this.cmdNoClaim = new CommandNoClaim(this);
         this.cmdAddMember = new CommandAddMember(this);
         this.cmdRemoveMember = new CommandRemoveMember(this);
+        
+        // Register
+        pm.registerEvents(new PlayerListener(this, this.cmdTool), this);
+        pm.registerEvents(new BlockListener(this), this);
+        pm.registerEvents(new InventoryListener(this), this);
         
         new BukkitRunnable()
         {
@@ -144,10 +147,15 @@ public class Plots extends JavaPlugin
         return this.cmanager;
     }
     
+    public int getOffset()
+    {
+        return this.offset;
+    }
+    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
     {
-        if(label.equals("plots"))
+        if(cmd.getName().equals("plot"))
         {
             if(args.length > 0)
             {
@@ -159,31 +167,52 @@ public class Plots extends JavaPlugin
                 {
                     this.cmdRemoveMember.execute(sender, args);
                 }
-                else if(args[0].equalsIgnoreCase("tool") || args[0].equalsIgnoreCase("t"))
+                /*else if(args[0].equalsIgnoreCase("tool") || args[0].equalsIgnoreCase("t"))
                 {
                     this.cmdTool.execute(sender, args);
-                }
-                else if(args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l"))
+                }*/
+                /*else if(args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l"))
                 {
                     this.cmdList.execute(sender, args);
-                }
-                else if(args[0].equalsIgnoreCase("remove"))
+                }*/
+                else if(args[0].equalsIgnoreCase("sell"))
                 {
-                    this.cmdRemove.execute(sender, args);
+                    this.cmdSell.execute(sender, args);
                 }
                 else if(args[0].equals("noclaim"))
                 {
                     this.cmdNoClaim.execute(sender, args);
                 }
+                else if(args[0].equals("?") || args[0].equals("help") || args[0].equals("h"))
+                {
+                    sender.sendMessage(ChatColor.GREEN+"[Plots]"+ChatColor.RESET+": Plots command list");
+                    //sender.sendMessage("/plot list "+(sender.hasPermission("plots.list.others") ? "[player] " : "")+"- show your "+(sender.hasPermission("plots.list.others") ? "or another player's " : "" )+"chunk list");
+                    sender.sendMessage("/plot sell - Sell the chunk you are standing on (if you own it, of course)");
+                    sender.sendMessage("/plot addmember <player> - Allow a player to build on your chunk");
+                    sender.sendMessage("/plot removemember <player> - Remove the rights of a player to build on your chunk");
+                    if(sender.hasPermission("plots.noclaim"))
+                    {
+                        sender.sendMessage("/plot noclaim add|remove - add or remove noclaim chunks");
+                    }
+                }
+                else
+                {
+                    sender.sendMessage(ChatColor.RED+"Incorrect syntax! For a complete list of commands, use: /plot");
+                }
             }
             else
             {
-                sender.sendMessage("Plots v"+this.getDescription().getVersion()+" by Fireblast709");
+                sender.sendMessage(ChatColor.GREEN+"[Plots]"+ChatColor.RESET+": Plots v"+this.getDescription().getVersion()+" by Fireblast709");
+                sender.sendMessage(ChatColor.GREEN+"[Plots]"+ChatColor.RESET+": Plots command list");
+                //sender.sendMessage("/plot list "+(sender.hasPermission("plots.list.others") ? "[player] " : "")+"- show your "+(sender.hasPermission("plots.list.others") ? "or another player's " : "" )+"chunk list");
+                sender.sendMessage("/plot sell - Sell the chunk you are standing on (if you own it, of course)");
+                sender.sendMessage("/plot addmember <player> - Allow a player to build on your chunk");
+                sender.sendMessage("/plot removemember <player> - Remove the rights of a player to build on your chunk");
                 if(sender.hasPermission("plots.noclaim"))
                 {
-                    sender.sendMessage("/plots noclaim add|remove - add or remove noclaim chunks");
+                    sender.sendMessage("/plot noclaim add|remove - add or remove noclaim chunks");
                 }
-                sender.sendMessage("/plots list "+(sender.hasPermission("plots.list.others") ? "[player] " : "")+"- show your "+(sender.hasPermission("plots.list.others") ? "or another player's " : "" )+"chunk list");
+                
             }
         }
         return true;
