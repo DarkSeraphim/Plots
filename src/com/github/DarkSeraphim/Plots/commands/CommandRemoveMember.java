@@ -4,6 +4,7 @@ import com.github.DarkSeraphim.Plots.Plots;
 import static org.bukkit.ChatColor.*;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 /**
@@ -21,37 +22,27 @@ public class CommandRemoveMember extends CommandBase
     @Override
     public boolean execute(CommandSender sender, String[] args)
     {
-        String chunk = "";
-        String member = "";
-        if(sender instanceof Player)
+        if(sender instanceof ConsoleCommandSender == false)
         {
-            if(args.length != 2)
-            {
-                sender.sendMessage(RED+"Invalid arguments: /plots removemember <player>");
-                return true;
-            }
-            Player player = (Player)sender;
-            Chunk c = player.getLocation().getChunk();
-            chunk = c.getX()+","+c.getZ();
+            return true;
         }
-        else
+        if(args.length != 3)
         {
-            if(args.length != 4)
-            {
-                sender.sendMessage("Invalid arguments: /plots removemember <cx> <cz> <player>");
-                return true;
-            }
-            chunk = args[1]+","+args[2];
-            member = args[3];
+            // Ignore, its the console anyway
+            //sender.sendMessage(RED+"Incorrect syntax: /plot addmember <owner> <member>");
+            return true;
         }
         
-        if(p.getChunkManager().removeMember(chunk, member))
+        for(String chunk : p.getChunkManager().getOwnedChunks(args[1]))
         {
-            sender.sendMessage(GREEN+"Member "+member+" removed from "+chunk);
-        }
-        else
-        {
-            sender.sendMessage(RED+"Failed to remove member "+member+" from "+chunk+". Was he a member?");
+            if(p.getChunkManager().removeMember(chunk, args[2]))
+            {
+                //sender.sendMessage(GREEN+"Member "+args[2]+" removed from "+chunk);
+            }
+            else
+            {
+                //sender.sendMessage(RED+"Failed to remove member "+args[2]+" from "+chunk+". Was he a member?");
+            }
         }
         return true;
     }

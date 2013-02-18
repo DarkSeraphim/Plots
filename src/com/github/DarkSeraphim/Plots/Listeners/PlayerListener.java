@@ -13,8 +13,10 @@ import org.bukkit.ChatColor;
 import static org.bukkit.ChatColor.*;
 import org.bukkit.Chunk;
 import org.bukkit.DyeColor;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import static org.bukkit.Material.*;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.EntityType;
@@ -238,6 +240,14 @@ public class PlayerListener implements Listener
                     p.getChunkManager().addChunk(name, chunk);
                     Economy.subtract(name, p.getCost());
                     player.sendMessage(GREEN+"You bought chunk "+LIGHT_PURPLE+chunk);
+                    
+                    double x = c.getX()*16+8;
+                    double z = c.getZ()*16+8;
+                    
+                    int y = c.getWorld().getHighestBlockYAt((int)x,(int)z)+1;
+                    
+                    c.getWorld().playEffect(new Location(c.getWorld(), x, y, z), Effect.MOBSPAWNER_FLAMES, 0, 50);
+                    player.playSound(player.getLocation(), Sound.ANVIL_LAND, 1f, 1f);
                     
                     selChunk(player, c, DyeColor.LIME.getWoolData());
                     this.confirmed.add(name);
